@@ -31,15 +31,17 @@ spec:
         {{- include "service.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - name: {{ (split "/" .Values.image.repository)._2  }}
+        - name: {{ (split "/" .Values.image.repository)._1  }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
-          envFrom: 
+          envFrom:
+            {{- if .Values.config }}
             - configMapRef:
                 name: {{ include "service.fullname" . }}-config
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

@@ -32,3 +32,4 @@ service:
 
   # This will end up inside configmap. Not encrypted at rest.
   config:
+    SERVICE1_URL: http://service1:8080
