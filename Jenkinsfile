@@ -27,8 +27,6 @@ pipeline {
             steps {
                 script {
                     dockerFilesToBuild = sh(returnStdout: true, script: "find . -name Dockerfile").trim().split('\n')
-                    println dockerFilesToBuild
-                    println dockerFilesToBuild.toString()
                     dockerFilesToBuild.each {
                         service = it.split('/')[1]
                         version = sh(returnStdout: true, script: "cat $service/version.py").trim()
