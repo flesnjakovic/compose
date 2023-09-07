@@ -1,4 +1,4 @@
-apiVersion: v3
+apiVersion: v2
 name: service1
 
 type: application
