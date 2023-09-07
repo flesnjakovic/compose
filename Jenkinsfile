@@ -2,6 +2,11 @@ def dockerFilesToBuild
 
 pipeline {
     agent any
+    
+    environment {
+        PATH = "/usr/local/bin:${env.PATH}"
+        DOCKER_HOST = "unix:///var/run/docker.sock"
+    }
 
     stages {
         stage('Checkout repository') {
@@ -27,7 +32,7 @@ pipeline {
                     dockerFilesToBuild.each {
                         service = it.split('/')[1]
                         version = sh(returnStdout: true, script: "cat $service/version.py").trim()
-                        docker.build(service, "-f $it/Dockerfile . -t $service:$version")
+                        docker.build(service, "-f $it ./$service -t flesnjakovic/$service:$version")
                     }
                 }
             }
@@ -44,13 +49,12 @@ pipeline {
         stage('Push Images') {
             steps {
                 script {
-                    // Push Docker images to a registry (replace with your registry details)
                     withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        docker.withRegistry('https://docker.io', 'docker-credentials') {
+                        docker.withRegistry('', 'docker-credentials') {
                             dockerFilesToBuild.each {
                                 service = it.split('/')[1]
-                                version = sh(returnStdout: true, script: "cat $it/version.py").trim()
-                                docker.image("$service:$version").push()
+                                version = sh(returnStdout: true, script: "cat $service/version.py").trim()
+                                docker.image("flesnjakovic/$service:$version").push()
                             }
                         }
                     }
